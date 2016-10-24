@@ -1,0 +1,25 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+
+use App\Http\Requests;
+
+class PurchaseController extends Controller
+{
+    //
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+    public function index()
+    {
+        return view('purchase.index');
+    }
+
+    public function  newPurchase()
+    {
+        return view('purchase.index');
+    }
+}
