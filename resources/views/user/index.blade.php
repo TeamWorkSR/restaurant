@@ -1,8 +1,12 @@
 @extends('layouts.app')
+@section('icon')
+    <i class="fa fa-user fa-fw"></i>
+@endsection
 @section('breadcrumb')
     {!! Breadcrumbs::render('user') !!}
 @endsection
 @section('content')
+
     <div class="row">
         <div class="col-lg-12">
             {{--<a href="{!! route('table.create') !!}"></a>--}}
