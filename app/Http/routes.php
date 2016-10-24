@@ -70,6 +70,12 @@ Route::group(['middleware' => 'auth'], function () {
         Route::get('customer', 'CustomerController@lists');
     });
 
+<<<<<<< HEAD
     /*this is comment*/
 
+=======
+    Route::get('ok',functino(){
+        echo "string";
+    });
+>>>>>>> 455234276e84e12df1c3cda4caf08a11581ae480
 });
