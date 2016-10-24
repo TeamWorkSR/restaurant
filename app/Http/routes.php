@@ -70,13 +70,4 @@ Route::group(['middleware' => 'auth'], function () {
         Route::get('customer', 'CustomerController@lists');
     });
 
-    /*this is comment*/
-    Route::get('ok',function(){
-        echo "string";
-    });
-    /*twherf*/
-    /*AAAA*/
-
-    /*add commit*/
-
 });
