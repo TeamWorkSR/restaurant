@@ -21,7 +21,7 @@
 
 </head>
 <?php $current_url = Route::getFacadeRoot()->current()->uri();?>
-<body class="hold-transition skin-red sidebar-mini">
+<body class="sidebar-mini skin-blue-light fixed">
 <!-- Site wrapper -->
 <div class="wrapper">
     <input type="hidden" id="url" value="{!! $current_url !!}">
@@ -187,12 +187,15 @@
         <section class="sidebar">
             <!-- Sidebar user panel -->
             <div class="user-panel">
-                <div class="pull-left image">
+                {{--<div class="pull-left image">
                     <img src="assets/dist/img/user2-160x160.jpg" class="img-circle" alt="User Image">
                 </div>
                 <div class="pull-left info">
                     <p>{!! Auth::getUser()->name !!}</p>
                     <a href="#"><i class="fa fa-circle text-success"></i> Online</a>
+                </div>--}}
+                <div class="clearfix text-center">
+                    <h4>Brand Name</h4>
                 </div>
             </div>
             <ul class="sidebar-menu">

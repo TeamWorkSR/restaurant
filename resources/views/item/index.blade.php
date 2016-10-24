@@ -173,7 +173,7 @@
             var id = $(this).data('id');
             $.confirm({
                 title: 'Delete Confirm!',
-//                content: 'Want to delete ?',
+                /*content: 'Want to delete ?',*/
                 confirmButtonClass: 'btn-info',
                 cancelButtonClass: 'btn-danger',
                 confirm: function () {
@@ -189,7 +189,7 @@
                     $.alert('Canceled!')
                 }
             });
-        })
+        });
         $('body').delegate('#edit', 'click', function () {
             var id = $(this).data('id');
             $.post('{!! url('edit/item') !!}', {id: id}, function (data) {
