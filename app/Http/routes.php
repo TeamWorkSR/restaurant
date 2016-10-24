@@ -73,4 +73,6 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('ok',functino(){
         echo "string";
     });
+    /*AAAA*/
+    
 });
