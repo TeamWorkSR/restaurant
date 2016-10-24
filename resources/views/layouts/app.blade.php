@@ -1,3 +1,4 @@
+<?php  $current_url = Route::getFacadeRoot()->current()->uri(); ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Restaurant System</title>
+    <title>{!! $current_url=='/'?'Home':ucfirst($current_url) !!} - Restaurant System</title>
     <link rel="shortcut icon" href="{!! asset('assets/favicon.png')!!}" type="image/ico" />
     <!-- Fonts -->
     {!! Html::style('assets/font-awesome/css/font-awesome.min.css') !!}
@@ -20,7 +21,6 @@
     {{--    {!! Html::style('assets/plugins/datatables/jquery.dataTables_themeroller.css') !!}--}}
 
 </head>
-<?php $current_url = Route::getFacadeRoot()->current()->uri();?>
 <body class="sidebar-mini skin-blue-light fixed">
 <!-- Site wrapper -->
 <div class="wrapper">
