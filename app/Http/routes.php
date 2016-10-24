@@ -74,4 +74,6 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('ok',function(){
         echo "string";
     });
+
+    /*twherf*/
 });
