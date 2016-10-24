@@ -70,7 +70,8 @@ Route::group(['middleware' => 'auth'], function () {
         Route::get('customer', 'CustomerController@lists');
     });
 
-    Route::get('ok',functino(){
+    /*this is comment*/
+    Route::get('ok',function(){
         echo "string";
     });
     /*AAAA*/
