@@ -69,4 +69,8 @@ Route::group(['middleware' => 'auth'], function () {
     Route::group(['prefix' => 'list'], function () {
         Route::get('customer', 'CustomerController@lists');
     });
+
+    Route::get('ok',functino(){
+        echo "string";
+    });
 });
