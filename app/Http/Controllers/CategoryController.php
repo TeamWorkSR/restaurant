@@ -67,10 +67,6 @@ class CategoryController extends Controller
             $category->fill(Request::all())->save();
             return json_encode(['success'=>'1']);
         }
-
-
-
-
     }
 
     public function valid()
