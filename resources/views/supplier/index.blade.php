@@ -14,10 +14,9 @@
     <br>
     <div class="row">
         <div class="col-lg-12">
-            <table class="table data dataTable">
+            <table class="table" id="grid-data" >
                 <thead>
                 <tr>
-                    <th>Id</th>
                     <th>Name</th>
                     <th>Sex</th>
                     <th>Deport</th>
@@ -28,7 +27,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                @foreach($suppliers as $supplier)
+                {{--@foreach($suppliers as $supplier)
                     <tr>
                         <td>{!! $supplier->name !!}</td>
                         <td>{!! $supplier->sex !!}</td>
@@ -42,7 +41,7 @@
                         </td>
                         <td></td>
                     </tr>
-                @endforeach
+                @endforeach--}}
                 </tbody>
             </table>
 
@@ -54,6 +53,29 @@
 @push('scripts')
 <script type="text/javascript">
     $(document).ready(function () {
+        var data =$('#grid-data').DataTable({
+            "bProcessing": true,
+            "serverSide": true,
+            "ajax": {
+                url: "{!! url('list/supplier') !!}",
+                type: "get",
+                error: function () {
+                    $('#grid-data').css('display', 'none');
+                }
+            },
+            "columns": [
+                {"data": "name"},
+                {"data": "sex"},
+                {"data": "deport"},
+                {"data": "tel"},
+                {"data": "email"},
+                {"data": "address"},
+                {data: 'action', name: 'action', orderable: false, searchable: false}
+            ]
+        });
+
+
+
         $('#createSupplier').bootstrapValidator({
             fields: {
                 name: {
@@ -104,7 +126,7 @@
             success: function () {
                 $("#createSupplier").bootstrapValidator('resetForm', true);
                 $('.create-form').modal('hide');
-                window.location.reload(true);
+                data.ajax.reload();
             }
         });
 
@@ -160,7 +182,8 @@
                 if (res.success == 1) {
                     $("#editSupplier").bootstrapValidator('resetForm', true);
                     $('.edit-form').modal('hide');
-                    window.location.reload(true);
+                    data.ajax.reload();
+
                 } else if (res.success == 0) {
                     alert('exist');
                 }
@@ -179,7 +202,7 @@
                         var data = JSON.parse(result);
                         if (data.success == '1') {
                             $.alert('Deleted');
-                            window.location.reload(true);
+                            data.ajax.reload();
                         }
                     });
                 },

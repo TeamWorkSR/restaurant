@@ -18,7 +18,7 @@
     <br>
     <div class="row">
         <div class="col-lg-12">
-            <table class="table data dataTable">
+            <table class="table data" id="grid-data">
                 <thead>
                 <tr>
                     <th>Name</th>
@@ -30,7 +30,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                @foreach($users as $user)
+               {{-- @foreach($users as $user)
                     <tr>
                         <td>{!! $user->name !!}</td>
                         <td>{!! $user->sex !!}</td>
@@ -43,7 +43,7 @@
 
                         </td>
                     </tr>
-                @endforeach
+                @endforeach--}}
                 </tbody>
             </table>
 
@@ -56,6 +56,28 @@
 @push('scripts')
 <script type="text/javascript">
     $(document).ready(function () {
+        $('#grid-data').DataTable({
+            "bProcessing": true,
+            "serverSide": true,
+            "ajax": {
+                url: "{!! url('list/user') !!}",
+                type: "get",
+                error: function () {
+                    $('#grid-data').css('display', 'none');
+                }
+            },
+            "columns": [
+                {"data": "name"},
+                {"data": "sex"},
+                {"data": "tel"},
+                {"data": "address"},
+                {"data": "email"},
+                {data: 'action', name: 'action', orderable: false, searchable: false}
+            ]
+        });
+
+
+
         $('#createUser').bootstrapValidator({
             fields: {
                 name: {

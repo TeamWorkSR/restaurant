@@ -6,6 +6,7 @@ use App\User;
 use Request;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Requests;
+use Yajra\Datatables\Datatables;
 
 class UserController extends Controller
 {
@@ -14,9 +15,10 @@ class UserController extends Controller
     {
         $this->middleware('auth');
     }
+
     public function index()
     {
-        $users = User::where('id','!=',\Auth::user()->id);
+        $users = User::where('id', '!=', \Auth::user()->id);
         return view('user.index')->with(compact('users'));
     }
 
@@ -52,7 +54,7 @@ class UserController extends Controller
     public function edit()
     {
         if (Request::ajax()) {
-            $table= User::findOrFail(Request::get('id'));
+            $table = User::findOrFail(Request::get('id'));
             return json_encode($table);
         }
     }
@@ -62,14 +64,26 @@ class UserController extends Controller
 
         $id = Request::get('id');
         $validator = Validator::make(Request::all(), [
-            'email' => 'unique:users,email,' .$id,
+            'email' => 'unique:users,email,' . $id,
         ]);
         if ($validator->fails()) {
-            return json_encode(['success'=>'0']);
-        }else{
-            $table= User::find($id);
+            return json_encode(['success' => '0']);
+        } else {
+            $table = User::find($id);
             $table->fill(Request::all())->save();
-            return json_encode(['success'=>'1']);
+            return json_encode(['success' => '1']);
         }
+    }
+
+    public function data()
+    {
+        return Datatables::of(User::all())
+            ->addColumn('action', function ($user) {
+                return
+                    '<a href="#" class="btn btn-xs btn-primary" data-id="' . $user->id . '"><i class="glyphicon glyphicon-edit id="edit"></i> Edit</a> ' .
+                    '<a href="#" class="btn btn-xs btn-default" data-id="' . $user->id . '"><i class="glyphicon glyphicon-edit" id="delete"></i> Delete</a>';
+            })
+            ->editColumn('id', '{{$id}}')
+            ->make(true);
     }
 }

@@ -6,6 +6,7 @@ use App\Supplier;
 use Request;
 
 use App\Http\Requests;
+use Yajra\Datatables\Datatables;
 
 class SupplierController extends Controller
 {
@@ -58,6 +59,18 @@ class SupplierController extends Controller
         $table= Supplier::find($id);
         $table->fill(Request::all())->save();
         return json_encode(['success'=>'1']);
+    }
+
+    public function data()
+    {
+        return Datatables::of(Supplier::all())
+            ->addColumn('action', function ($supplier) {
+                return
+                    '<a href="#" class="btn btn-xs btn-primary" data-id="'.$supplier->id.'" id="edit"><i class="glyphicon glyphicon-edit" ></i> Edit</a> ' .
+                    '<a href="#" class="btn btn-xs btn-default" data-id="'.$supplier->id.'" id="delete"><i class="glyphicon glyphicon-edit" ></i> Delete</a>';
+            })
+            ->editColumn('id', '{{$id}}')
+            ->make(true);
     }
 
 }

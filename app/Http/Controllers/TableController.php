@@ -6,6 +6,7 @@ use App\Table;
 use Request;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Requests;
+use Yajra\Datatables\Datatables;
 
 class TableController extends Controller
 {
@@ -73,6 +74,17 @@ class TableController extends Controller
             }
         }
 
+    }
+    public function data()
+    {
+        return Datatables::of(Table::all())
+            ->addColumn('action', function ($table) {
+                return
+                    '<a href="#" class="btn btn-xs btn-primary" data-id="'.$table->id.'" id="edit"><i class="glyphicon glyphicon-edit" ></i> Edit</a> ' .
+                    '<a href="#" class="btn btn-xs btn-default" data-id="'.$table->id.'" id="delete"><i class="glyphicon glyphicon-edit" ></i> Delete</a>';
+            })
+            ->editColumn('id', '{{$id}}')
+            ->make(true);
     }
     
 }

@@ -6,6 +6,7 @@ use App\Customer;
 use Request;
 
 use App\Http\Requests;
+use Yajra\Datatables\Datatables;
 
 class CustomerController extends Controller
 {
@@ -61,8 +62,15 @@ class CustomerController extends Controller
             return json_encode(['success' => '1']);
         }
     }
-    public function lists()
+    public function data()
     {
-        return Customer::all();
+        return Datatables::of(Customer::all())
+            ->addColumn('action', function ($customer) {
+                return
+                    '<a href="#" class="btn btn-xs btn-primary" data-id="'.$customer->id.'" id="edit"><i class="glyphicon glyphicon-edit" ></i> Edit</a> ' .
+                    '<a href="#" class="btn btn-xs btn-default" data-id="'.$customer->id.'" id="delete"><i class="glyphicon glyphicon-edit" ></i> Delete</a>';
+            })
+            ->editColumn('id', '{{$id}}')
+            ->make(true);
     }
 }

@@ -67,7 +67,13 @@ Route::group(['middleware' => 'auth'], function () {
         Route::post('item', 'ItemController@update');
     });
     Route::group(['prefix' => 'list'], function () {
-        Route::get('customer', 'CustomerController@lists');
+        Route::get('user', 'UserController@data');
+        Route::get('customer', 'CustomerController@data');
+        Route::get('supplier', 'SupplierController@data');
+        Route::get('exchange', 'ExchangeController@data');
+        Route::get('promotion', 'PromotionController@data');
+        Route::get('table', 'TableController@data');
+        Route::get('category', 'CategoryController@data');
     });
 
 });

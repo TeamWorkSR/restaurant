@@ -14,7 +14,7 @@
     <br>
     <div class="row">
         <div class="col-lg-12">
-            <table class="table data dataTable" id="datalist">
+            <table class="table data" id="grid-data">
                 <thead>
                 <tr>
                     <th>Name</th>
@@ -26,15 +26,8 @@
                 </tr>
                 </thead>
                 <tbody>
-                {{--<tr v-for="customer in customers">
-                    <td>@{{ customer.name }}</td>
-                    <td>@{{ customer.sex }}</td>
-                    <td>@{{ customer.address }}</td>
-                    <td>@{{ customer.tel }}</td>
-                    <td>@{{ customer.email }}</td>
-                    <td>@{{ customer.email }}</td>
-                </tr>--}}
-                @foreach($customers as $customer)
+
+                {{--@foreach($customers as $customer)
                     <tr>
                         <td>{!! $customer->name !!}</td>
                         <td>{!! $customer->sex !!}</td>
@@ -46,7 +39,7 @@
                             {!! Html::link('#','Edit',['data-id'=>$customer->id,'id'=>'edit','class'=>'btn btn-default btn-xs']) !!}
                         </td>
                     </tr>
-                    @endforeach
+                    @endforeach--}}
 
                 </tbody>
             </table>
@@ -55,28 +48,32 @@
     @include('customer.create')
     @include('customer.edit')
 @endsection
-@push('scripts')
-<script type="text/javascript">
-    new Vue({
-        el: '#datalist',
-        methods: {
-            fetchCustomers: function () {
-                this.$http.get('{!! url('list/customer') !!}', function (data) {
-                    this.$set('customers', data)
-                });
-            }
-        },
-        ready: function () {
-            this.fetchCustomers();
-        }
-
-    })
-</script>
-@endpush
 
 @push('scripts')
 <script type="text/javascript">
     $(document).ready(function () {
+
+        var data =$('#grid-data').DataTable({
+            "bProcessing": true,
+            "serverSide": true,
+            "ajax": {
+                url: "{!! url('list/customer') !!}",
+                type: "get",
+                error: function () {
+                    $('#grid-data').css('display', 'none');
+                }
+            },
+            "columns": [
+                {"data": "name"},
+                {"data": "sex"},
+                {"data": "address"},
+                {"data": "tel"},
+                {"data": "email"},
+                {data: 'action', name: 'action', orderable: false, searchable: false}
+            ]
+        });
+
+
         $('#createCustomer').bootstrapValidator({
             fields: {
                 name: {
@@ -125,7 +122,8 @@
             success: function () {
                 $("#createCustomer").bootstrapValidator('resetForm', true);
                 $('.create-form').modal('hide');
-                window.location.reload(true);
+//                window.location.reload(true);
+                data.ajax.reload();
             }
         });
 
@@ -174,11 +172,10 @@
                 if (res.success==1) {
                     $("#editCustomer").bootstrapValidator('resetForm', true);
                     $('.edit-form').modal('hide');
-                    window.location.reload(true);
+                    data.ajax.reload(null,false);
                 }else if (res.success==0) {
                     alert('exist');
                 }
-
             }
         });
 
@@ -195,7 +192,7 @@
                         var data = JSON.parse(result);
                         if(data.success=='1') {
                             $.alert('Deleted');
-                            window.location.reload(true);
+                            data.ajax.reload(null,false);
                         }
                     });
                 },
