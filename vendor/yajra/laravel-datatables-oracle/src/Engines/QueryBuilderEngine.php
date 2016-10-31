@@ -4,8 +4,8 @@ namespace Yajra\Datatables\Engines;
 
 use Closure;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOneOrMany;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Str;
 use Yajra\Datatables\Helper;
@@ -100,10 +100,10 @@ class QueryBuilderEngine extends BaseEngine
             $row_count = $this->wrap('row_count');
             $myQuery->select($this->connection->raw("'1' as {$row_count}"));
         }
-    
+
         // check for select soft deleted records
         if (! $this->withTrashed && $this->modelUseSoftDeletes()) {
-            $myQuery->whereNull($myQuery->getModel()->getTable().'.deleted_at');
+            $myQuery->whereNull($myQuery->getModel()->getTable() . '.deleted_at');
         }
 
         return $this->connection->table($this->connection->raw('(' . $myQuery->toSql() . ') count_row_table'))
@@ -119,6 +119,20 @@ class QueryBuilderEngine extends BaseEngine
     protected function wrap($column)
     {
         return $this->connection->getQueryGrammar()->wrap($column);
+    }
+
+    /**
+     * Check if model use SoftDeletes trait
+     *
+     * @return boolean
+     */
+    private function modelUseSoftDeletes()
+    {
+        if ($this->query_type == 'eloquent') {
+            return in_array('Illuminate\Database\Eloquent\SoftDeletes', class_uses($this->query->getModel()));
+        }
+
+        return false;
     }
 
     /**
@@ -257,13 +271,18 @@ class QueryBuilderEngine extends BaseEngine
      */
     protected function compileRelationSearch($query, $relation, $column, $keyword)
     {
-        $myQuery = clone $this->query;
-        $myQuery->orWhereHas($relation, function ($builder) use ($column, $keyword, $query) {
+        $myQuery      = clone $this->query;
+        $relationType = $myQuery->getModel()->{$relation}();
+        $myQuery->orWhereHas($relation, function ($builder) use ($column, $keyword, $query, $relationType) {
             $builder->select($this->connection->raw('count(1)'));
             $this->compileQuerySearch($builder, $column, $keyword, '');
             $builder = "({$builder->toSql()}) >= 1";
 
-            $query->orWhereRaw($builder, [$this->prepareKeyword($keyword)]);
+            if ($relationType instanceof MorphToMany) {
+                $query->orWhereRaw($builder, [$relationType->getMorphClass(), $this->prepareKeyword($keyword)]);
+            } else {
+                $query->orWhereRaw($builder, [$this->prepareKeyword($keyword)]);
+            }
         });
     }
 
@@ -277,7 +296,6 @@ class QueryBuilderEngine extends BaseEngine
      */
     protected function compileQuerySearch($query, $column, $keyword, $relation = 'or')
     {
-        $column = strstr($column, '(') ? $this->connection->raw($column) : $column;
         $column = $this->castColumn($column);
         $sql    = $column . ' LIKE ?';
 
@@ -399,21 +417,7 @@ class QueryBuilderEngine extends BaseEngine
 
         return $this->setupKeyword($keyword);
     }
-    
-    /**
-     * Check if model use SoftDeletes trait
-     *
-     * @return boolean
-     */
-    private function modelUseSoftDeletes()
-    {
-        if ($this->query_type == 'eloquent') {
-            return in_array('Illuminate\Database\Eloquent\SoftDeletes', class_uses($this->query->getModel()));
-        }
-        
-        return false;
-    }
-    
+
     /**
      * Join eager loaded relation and get the related column name.
      *
@@ -448,7 +452,7 @@ class QueryBuilderEngine extends BaseEngine
             }
         } else {
             $table = $model->getRelated()->getTable();
-            if ($model instanceof HasOne || $model instanceof HasMany) {
+            if ($model instanceof HasOneOrMany) {
                 $foreign = $model->getForeignKey();
                 $other   = $model->getQualifiedParentKeyName();
             } else {
@@ -531,6 +535,7 @@ class QueryBuilderEngine extends BaseEngine
                     $orderable['direction']
                 );
             } else {
+                $valid = 1;
                 if (count(explode('.', $column)) > 1) {
                     $eagerLoads     = $this->getEagerLoads();
                     $parts          = explode('.', $column);
@@ -538,11 +543,18 @@ class QueryBuilderEngine extends BaseEngine
                     $relation       = implode('.', $parts);
 
                     if (in_array($relation, $eagerLoads)) {
-                        $column = $this->joinEagerLoadedColumn($relation, $relationColumn);
+                        $relationship = $this->query->getRelation($relation);
+                        if (! ($relationship instanceof MorphToMany)) {
+                            $column = $this->joinEagerLoadedColumn($relation, $relationColumn);
+                        } else {
+                            $valid = 0;
+                        }
                     }
                 }
 
-                $this->getQueryBuilder()->orderBy($column, $orderable['direction']);
+                if ($valid == 1) {
+                    $this->getQueryBuilder()->orderBy($column, $orderable['direction']);
+                }
             }
         }
     }
