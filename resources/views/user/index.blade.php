@@ -76,8 +76,6 @@
             ]
         });
 
-
-
         $('#createUser').bootstrapValidator({
             fields: {
                 name: {
